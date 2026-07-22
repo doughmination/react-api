@@ -49,6 +49,7 @@ export {
   useDiscordUser,
   useDiscordUsers,
   useDiscordStatus,
+  useGuild,
 } from "./hooks/discord";
 export type { QueryOptionsFor } from "./hooks/discord";
 

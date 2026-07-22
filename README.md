@@ -1,5 +1,13 @@
 # @doughmination/react-api
 
+[![Socket Badge](https://badge.socket.dev/npm/package/@doughmination/react-api)](https://badge.socket.dev/npm/package/@doughmination/react-api)
+[![npm version](https://img.shields.io/npm/v/@doughmination/react-api.svg)](https://www.npmjs.com/package/@doughmination/react-api)
+[![Publish](https://github.com/doughmination/react-api/actions/workflows/publish.yml/badge.svg)](https://github.com/doughmination/react-api/actions/workflows/publish.yml)
+[![types included](https://img.shields.io/npm/types/@doughmination/react-api.svg)](https://www.npmjs.com/package/@doughmination/react-api)
+[![React 18 | 19](https://img.shields.io/badge/React-18%20%7C%2019-61dafb.svg?logo=react)](https://react.dev)
+[![TanStack Query v5](https://img.shields.io/badge/TanStack%20Query-v5-ef4444.svg)](https://tanstack.com/query)
+[![license](https://img.shields.io/badge/license-custom-blue.svg)](./licence.md)
+
 Typed client and React hooks for the [Doughmination API](https://doughmination.uk/docs) — Discord presence, Minecraft & Hypixel stats, the plural system (fronters, members, mental state), devices and the guestbook — all backed by a **single shared WebSocket** for live updates.
 
 - **Zero-config reads.** Every public read works with no auth. Construct the provider with nothing but a `QueryClient` and you're live.
@@ -354,4 +362,4 @@ bun run build     # tsup → dist/ (ESM + CJS + .d.ts)
 
 ## Licence
 
-See the repository.
+ESAL-2.3

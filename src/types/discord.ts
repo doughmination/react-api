@@ -308,3 +308,25 @@ export interface DiscordGatewayStatus {
   connected_since?: number | null;
   [key: string]: unknown;
 }
+
+/**
+ * GET /v2/discord/guilds/:invite — a public invite resolved to a guild
+ * preview. `invite` is the vanity or invite code (e.g. "TransRights").
+ *
+ * Modelled from the fields the API's invite resolver returns; approximate
+ * counts are only present when the invite exposes them. The index signature
+ * keeps any extra upstream fields accessible without a package bump.
+ */
+export interface DiscordGuildPreview {
+  /** Guild snowflake id, when present. */
+  id?: string;
+  name: string;
+  icon_url: string | null;
+  banner_url: string | null;
+  description: string | null;
+  /** Approximate total members; null when the invite hides it. */
+  member_count: number | null;
+  /** Approximate members online; null when the invite hides it. */
+  online_count: number | null;
+  [key: string]: unknown;
+}

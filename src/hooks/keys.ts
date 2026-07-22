@@ -13,6 +13,8 @@ export const queryKeys = {
     users: (ids: string[]) =>
       ["doughmination", "discord", "users", [...ids].sort().join(",")] as const,
     status: () => ["doughmination", "discord", "status"] as const,
+    guild: (invite: string) =>
+      ["doughmination", "discord", "guild", invite] as const,
   },
 
   minecraft: {

@@ -1,0 +1,73 @@
+# Publish @doughmination/react-api to npm — manual trigger only.
+#
+# Run it from the Actions tab (or `gh workflow run publish.yml`). It typechecks
+# and builds first, then publishes the version currently in package.json. npm
+# rejects a version that already exists, so bump `version` before running.
+#
+# The dist-tag is derived from the version: a prerelease (e.g. 1.0.0-beta.1)
+# publishes under `next`, anything else under `latest`.
+#
+# Auth is npm trusted publishing (OIDC) — no NPM_TOKEN secret required.
+name: Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Build + pack only, do not publish"
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      # Required for npm provenance (--provenance).
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Build
+        run: bun run build
+
+      - name: Resolve dist-tag from version
+        id: tag
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if [[ "$VERSION" == *-* ]]; then TAG=next; else TAG=latest; fi
+          echo "Publishing $VERSION under dist-tag: $TAG"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Pack (dry run)
+        if: ${{ inputs.dry_run }}
+        run: npm pack --dry-run
+
+      - name: Publish to npm
+        if: ${{ !inputs.dry_run }}
+        run: npm publish --access public --tag "${{ steps.tag.outputs.tag }}"

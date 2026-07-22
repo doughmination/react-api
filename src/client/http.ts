@@ -16,6 +16,7 @@ import type {
   UnifiedRecord,
   UnifiedRecordMap,
   DiscordGatewayStatus,
+  DiscordGuildPreview,
 } from "../types/discord";
 import type {
   UnifiedMinecraftGeneral,
@@ -269,6 +270,17 @@ export class DoughminationClient {
       envelope: "worker",
       signal,
     });
+  }
+
+  /** GET /discord/guilds/:invite — resolve a public invite to a guild preview. */
+  getGuild(invite: string, signal?: AbortSignal): Promise<DiscordGuildPreview> {
+    return this.request<DiscordGuildPreview>(
+      `/discord/guilds/${encodeURIComponent(invite)}`,
+      {
+        envelope: "worker",
+        signal,
+      },
+    );
   }
 
   // ---- Minecraft ----------------------------------------------------------

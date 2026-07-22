@@ -16,6 +16,7 @@ import type {
   UnifiedRecord,
   UnifiedRecordMap,
   DiscordGatewayStatus,
+  DiscordGuildPreview,
 } from "../types/discord";
 
 /** Options passed through to TanStack Query, minus the parts we control. */
@@ -73,6 +74,30 @@ export function useDiscordStatus(
   return useQuery({
     queryKey: queryKeys.discord.status(),
     queryFn: ({ signal }) => client.getDiscordStatus(signal),
+    ...options,
+  });
+}
+
+/**
+ * Resolve a public Discord invite to a guild preview (name, icon, banner,
+ * approximate member/online counts). `invite` is the vanity or invite code.
+ *
+ * ```tsx
+ * const { data } = useGuild("TransRights");
+ * ```
+ */
+export function useGuild(
+  invite: string | null | undefined,
+  options?: QueryOptionsFor<DiscordGuildPreview>,
+): UseQueryResult<DiscordGuildPreview, DoughminationError> {
+  const client = useDoughminationClient();
+
+  return useQuery({
+    queryKey: queryKeys.discord.guild(invite ?? ""),
+    queryFn: ({ signal }) => client.getGuild(invite as string, signal),
+    enabled: Boolean(invite) && (options?.enabled ?? true),
+    // Invites change rarely; the old DM cache used a 5-minute maxAge.
+    staleTime: 5 * 60 * 1000,
     ...options,
   });
 }
