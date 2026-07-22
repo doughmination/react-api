@@ -355,9 +355,9 @@ Escape hatches: `useDoughminationClient()` (the client), `useDoughminationSocket
 ## Development
 
 ```bash
-npm install
-npm run typecheck
-npm run build    # tsup → dist/ (ESM + CJS + .d.ts)
+bun install
+bun run typecheck
+bun run build    # tsup → dist/ (ESM + CJS + .d.ts)
 ```
 
 ## Licence
