@@ -66,6 +66,7 @@ export {
   useMentalState,
   useSystem,
   useMemberStatus,
+  useRelationships,
   useUserInfo,
 } from "./hooks/plural";
 
@@ -93,12 +94,16 @@ export {
   useSetFronters,
   useSwitchFront,
   useSetMentalState,
+  useSetMemberPride,
+  useAddRelationship,
+  useRemoveRelationship,
   useReportDevice,
 } from "./hooks/mutations";
 export type {
   LoginVariables,
   SignupVariables,
   SetMentalStateVariables,
+  SetMemberPrideVariables,
   MutationOptionsFor,
 } from "./hooks/mutations";
 

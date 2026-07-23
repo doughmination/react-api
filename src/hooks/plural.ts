@@ -20,6 +20,7 @@ import type {
   PluralMember,
   PluralSystem,
   MemberStatusResponse,
+  RelationshipsResponse,
   UserResponse,
 } from "../types/plural";
 
@@ -182,6 +183,20 @@ export function useMemberStatus(
     queryKey: queryKeys.plural.memberStatus(identifier ?? ""),
     queryFn: ({ signal }) => client.getMemberStatus(identifier as string, signal),
     enabled: Boolean(identifier) && (options?.enabled ?? true),
+    ...options,
+  });
+}
+
+/** The whole system's relationship map. Public read. */
+export function useRelationships(
+  options?: QueryOptionsFor<RelationshipsResponse>,
+): UseQueryResult<RelationshipsResponse, DoughminationError> {
+  const client = useDoughminationClient();
+
+  return useQuery({
+    queryKey: queryKeys.plural.relationships(),
+    queryFn: ({ signal }) => client.getRelationships(signal),
+    staleTime: 60 * 1000,
     ...options,
   });
 }

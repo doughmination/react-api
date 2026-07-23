@@ -35,6 +35,7 @@ export const queryKeys = {
     mentalState: () => ["doughmination", "plural", "mental-state"] as const,
     memberStatus: (id: string) =>
       ["doughmination", "plural", "member-status", id] as const,
+    relationships: () => ["doughmination", "plural", "relationships"] as const,
     userInfo: () => ["doughmination", "plural", "user-info"] as const,
     usernameCheck: (username: string) =>
       ["doughmination", "plural", "username-check", username] as const,

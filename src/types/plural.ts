@@ -85,6 +85,11 @@ export interface PluralMember {
   // ---- Doughmination API enrichments ------------------------------------
   /** Tags from the API's own member-tag store (e.g. ["Host"]). */
   tags?: string[];
+  /**
+   * Pride identity labels from the API's own store (e.g. ["Lesbian", "Trans"]).
+   * Public-readable; only the owner can edit them.
+   */
+  pride?: string[];
   /** Status note from the API's own store; null when none is set. */
   status?: PluralMemberStatus | null;
   /** True when the API substituted a special display name. */
@@ -268,4 +273,35 @@ export interface SwitchResponse {
   fronters?: Array<{ id: string; name: string; display_name: string }>;
   count?: number;
   data?: unknown;
+}
+
+// ---- Relationships ---------------------------------------------------------
+
+/**
+ * One undirected relationship edge between two members. Polyamory is modelled
+ * by a member appearing in several edges — there is no per-member limit.
+ */
+export interface Relationship {
+  /** Server-generated UUID; use it to delete the edge. */
+  id: string;
+  /** The two linked member ids (order is not meaningful). */
+  members: [string, string];
+  /** Free-form label, e.g. "partner"; defaults to "partner" server-side. */
+  type: string;
+  /** "YYYY-MM-DD" or null when unset. */
+  since: string | null;
+}
+
+/** GET /v2/plural/relationships — public read of the whole map. */
+export interface RelationshipsResponse {
+  status: string;
+  relationships: Relationship[];
+}
+
+/** POST /v2/plural/relationships — owner only. */
+export interface AddRelationshipInput {
+  memberA: string;
+  memberB: string;
+  type?: string;
+  since?: string | null;
 }

@@ -18,6 +18,8 @@ import type {
   LoginResponse,
   SignupResponse,
   SwitchResponse,
+  Relationship,
+  AddRelationshipInput,
 } from "../types/plural";
 import type {
   GuestbookPostInput,
@@ -239,6 +241,97 @@ export function useSetMentalState(
   return useMutation({
     mutationFn: (variables) => client.setMentalState(variables),
     ...options,
+  });
+}
+
+export interface SetMemberPrideVariables {
+  /** Member id or name. */
+  identifier: string;
+  /** The pride identity label, e.g. "Lesbian". */
+  identity: string;
+  /** "add" (default) attaches it; "remove" detaches it. */
+  action?: "add" | "remove";
+}
+
+/**
+ * Add or remove a member's pride identity (owner only).
+ *
+ * Invalidates the members and fronters caches so the enriched `pride` field
+ * refetches everywhere it is shown.
+ */
+export function useSetMemberPride(
+  options?: MutationOptionsFor<
+    { status: string; message: string },
+    SetMemberPrideVariables
+  >,
+): UseMutationResult<
+  { status: string; message: string },
+  DoughminationError,
+  SetMemberPrideVariables
+> {
+  const client = useDoughminationClient();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (variables) =>
+      variables.action === "remove"
+        ? client.removeMemberPride(variables.identifier, variables.identity)
+        : client.addMemberPride(variables.identifier, variables.identity),
+    ...options,
+    onSuccess: (data, variables, onMutateResult, context) => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.plural.members() });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.plural.fronters() });
+      options?.onSuccess?.(data, variables, onMutateResult, context);
+    },
+  });
+}
+
+/** Add a relationship edge between two members (owner only). */
+export function useAddRelationship(
+  options?: MutationOptionsFor<
+    { status: string; relationship: Relationship },
+    AddRelationshipInput
+  >,
+): UseMutationResult<
+  { status: string; relationship: Relationship },
+  DoughminationError,
+  AddRelationshipInput
+> {
+  const client = useDoughminationClient();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input) => client.addRelationship(input),
+    ...options,
+    onSuccess: (data, variables, onMutateResult, context) => {
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.plural.relationships(),
+      });
+      options?.onSuccess?.(data, variables, onMutateResult, context);
+    },
+  });
+}
+
+/** Remove a relationship edge by id (owner only). */
+export function useRemoveRelationship(
+  options?: MutationOptionsFor<{ status: string; message: string }, string>,
+): UseMutationResult<
+  { status: string; message: string },
+  DoughminationError,
+  string
+> {
+  const client = useDoughminationClient();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => client.removeRelationship(id),
+    ...options,
+    onSuccess: (data, variables, onMutateResult, context) => {
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.plural.relationships(),
+      });
+      options?.onSuccess?.(data, variables, onMutateResult, context);
+    },
   });
 }
 

@@ -41,6 +41,9 @@ import type {
   ResetTokenCheckResponse,
   ResetPasswordResponse,
   SwitchResponse,
+  Relationship,
+  RelationshipsResponse,
+  AddRelationshipInput,
 } from "../types/plural";
 import type {
   DeviceRecord,
@@ -371,6 +374,14 @@ export class DoughminationClient {
     );
   }
 
+  /** GET /plural/relationships — the whole relationship map. Public read. */
+  getRelationships(signal?: AbortSignal): Promise<RelationshipsResponse> {
+    return this.request<RelationshipsResponse>("/plural/relationships", {
+      envelope: "bare",
+      signal,
+    });
+  }
+
   // ---- Plural: auth -------------------------------------------------------
 
   /**
@@ -659,6 +670,77 @@ export class DoughminationClient {
   forceRefresh(signal?: AbortSignal): Promise<unknown> {
     return this.request("/plural/admin/refresh", {
       method: "POST",
+      envelope: "bare",
+      auth: "bearer",
+      signal,
+    });
+  }
+
+  // ---- Pride identities (owner only) --------------------------------------
+
+  /** POST /plural/member-pride/:identifier/add — owner only. */
+  addMemberPride(
+    identifier: string,
+    identity: string,
+    signal?: AbortSignal,
+  ): Promise<{ status: string; message: string }> {
+    return this.request(
+      `/plural/member-pride/${encodeURIComponent(identifier)}/add`,
+      {
+        method: "POST",
+        envelope: "bare",
+        auth: "bearer",
+        body: { identity },
+        signal,
+      },
+    );
+  }
+
+  /** DELETE /plural/member-pride/:identifier/:identity — owner only. */
+  removeMemberPride(
+    identifier: string,
+    identity: string,
+    signal?: AbortSignal,
+  ): Promise<{ status: string; message: string }> {
+    return this.request(
+      `/plural/member-pride/${encodeURIComponent(identifier)}/${encodeURIComponent(identity)}`,
+      {
+        method: "DELETE",
+        envelope: "bare",
+        auth: "bearer",
+        signal,
+      },
+    );
+  }
+
+  // ---- Relationships (owner-only writes) ----------------------------------
+
+  /** POST /plural/relationships — owner only. */
+  addRelationship(
+    input: AddRelationshipInput,
+    signal?: AbortSignal,
+  ): Promise<{ status: string; relationship: Relationship }> {
+    return this.request("/plural/relationships", {
+      method: "POST",
+      envelope: "bare",
+      auth: "bearer",
+      body: {
+        memberA: input.memberA,
+        memberB: input.memberB,
+        ...(input.type ? { type: input.type } : {}),
+        ...(input.since !== undefined ? { since: input.since } : {}),
+      },
+      signal,
+    });
+  }
+
+  /** DELETE /plural/relationships/:id — owner only. */
+  removeRelationship(
+    id: string,
+    signal?: AbortSignal,
+  ): Promise<{ status: string; message: string }> {
+    return this.request(`/plural/relationships/${encodeURIComponent(id)}`, {
+      method: "DELETE",
       envelope: "bare",
       auth: "bearer",
       signal,
