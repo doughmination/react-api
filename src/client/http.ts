@@ -29,17 +29,7 @@ import type {
   PluralSystem,
   MentalState,
   MemberStatusResponse,
-  LoginResponse,
-  SignupResponse,
   UserResponse,
-  UsernameCheckResponse,
-  EmailCheckResponse,
-  VerifyEmailResponse,
-  ResendVerificationResponse,
-  CorrectEmailResponse,
-  AccountRecoveryResponse,
-  ResetTokenCheckResponse,
-  ResetPasswordResponse,
   SwitchResponse,
   Relationship,
   RelationshipsResponse,
@@ -382,199 +372,23 @@ export class DoughminationClient {
     });
   }
 
-  // ---- Plural: auth -------------------------------------------------------
+  // ---- Plural: auth (PocketID / OIDC only) --------------------------------
 
   /**
-   * POST /plural/login — JSON login. The Turnstile token is mandatory and
-   * must come from the consuming app's widget.
-   */
-  login(input: {
-    username: string;
-    password: string;
-    turnstileToken: string;
-    signal?: AbortSignal;
-  }): Promise<LoginResponse> {
-    return this.request<LoginResponse>("/plural/login", {
-      method: "POST",
-      envelope: "bare",
-      body: {
-        username: input.username,
-        password: input.password,
-        turnstile_token: input.turnstileToken,
-      },
-      signal: input.signal,
-    });
-  }
-
-  /**
-   * POST /plural/signup — password ≥10 chars, email now required.
+   * The URL that starts the PocketID login. Send the browser here (a full
+   * navigation, not fetch) — the API 302s to PocketID, and after sign-in the
+   * user lands back on the app's callback page with a token in the fragment.
    *
-   * The new account can't log in until the emailed link is confirmed. Keep
-   * the returned `correction_token` if you want to let the user fix a typo'd
-   * address without a password.
-   */
-  signup(input: {
-    username: string;
-    password: string;
-    email: string;
-    displayName?: string | null;
-    turnstileToken: string;
-    signal?: AbortSignal;
-  }): Promise<SignupResponse> {
-    return this.request<SignupResponse>("/plural/signup", {
-      method: "POST",
-      envelope: "bare",
-      body: {
-        username: input.username,
-        password: input.password,
-        email: input.email,
-        display_name: input.displayName ?? null,
-        turnstile_token: input.turnstileToken,
-      },
-      signal: input.signal,
-    });
-  }
-
-  /** GET /plural/users/check-username — public availability check. */
-  checkUsername(
-    username: string,
-    signal?: AbortSignal,
-  ): Promise<UsernameCheckResponse> {
-    return this.request<UsernameCheckResponse>("/plural/users/check-username", {
-      envelope: "bare",
-      query: { username },
-      signal,
-    });
-  }
-
-  /** GET /plural/users/check-email — availability check, rate limited 20/min/IP. */
-  checkEmail(email: string, signal?: AbortSignal): Promise<EmailCheckResponse> {
-    return this.request<EmailCheckResponse>("/plural/users/check-email", {
-      envelope: "bare",
-      query: { email },
-      signal,
-    });
-  }
-
-  // ---- Email verification -------------------------------------------------
-
-  /** POST /plural/verify-email — confirm an address with the emailed token. */
-  verifyEmail(token: string, signal?: AbortSignal): Promise<VerifyEmailResponse> {
-    return this.request<VerifyEmailResponse>("/plural/verify-email", {
-      method: "POST",
-      envelope: "bare",
-      body: { token },
-      signal,
-    });
-  }
-
-  /**
-   * POST /plural/resend-verification — resend the confirmation email.
+   * `from` is the app path to return to after login (defaults to "/").
    *
-   * Identify the account either by `correctionToken` (held by the tab that
-   * signed up) or by username + password. Turnstile required.
+   * ```ts
+   * window.location.href = client.pocketIdLoginUrl("/admin/dash");
+   * ```
    */
-  resendVerification(input: {
-    turnstileToken: string;
-    correctionToken?: string;
-    username?: string;
-    password?: string;
-    signal?: AbortSignal;
-  }): Promise<ResendVerificationResponse> {
-    return this.request<ResendVerificationResponse>("/plural/resend-verification", {
-      method: "POST",
-      envelope: "bare",
-      body: {
-        turnstile_token: input.turnstileToken,
-        ...(input.correctionToken ? { correction_token: input.correctionToken } : {}),
-        ...(input.username ? { username: input.username } : {}),
-        ...(input.password ? { password: input.password } : {}),
-      },
-      signal: input.signal,
-    });
-  }
-
-  /**
-   * POST /plural/correct-email — fix a mistyped address before verification,
-   * using the single-use correction token from signup (no password needed).
-   */
-  correctEmail(input: {
-    correctionToken: string;
-    email: string;
-    turnstileToken: string;
-    signal?: AbortSignal;
-  }): Promise<CorrectEmailResponse> {
-    return this.request<CorrectEmailResponse>("/plural/correct-email", {
-      method: "POST",
-      envelope: "bare",
-      body: {
-        correction_token: input.correctionToken,
-        email: input.email,
-        turnstile_token: input.turnstileToken,
-      },
-      signal: input.signal,
-    });
-  }
-
-  // ---- Password / username recovery ---------------------------------------
-
-  /** POST /plural/forgot-password — email a reset link to the account on file. */
-  forgotPassword(input: {
-    username: string;
-    turnstileToken: string;
-    signal?: AbortSignal;
-  }): Promise<AccountRecoveryResponse> {
-    return this.request<AccountRecoveryResponse>("/plural/forgot-password", {
-      method: "POST",
-      envelope: "bare",
-      body: { username: input.username, turnstile_token: input.turnstileToken },
-      signal: input.signal,
-    });
-  }
-
-  /** POST /plural/forgot-username — email the username to the given address. */
-  forgotUsername(input: {
-    email: string;
-    turnstileToken: string;
-    signal?: AbortSignal;
-  }): Promise<AccountRecoveryResponse> {
-    return this.request<AccountRecoveryResponse>("/plural/forgot-username", {
-      method: "POST",
-      envelope: "bare",
-      body: { email: input.email, turnstile_token: input.turnstileToken },
-      signal: input.signal,
-    });
-  }
-
-  /** GET /plural/reset-password/check — is a reset token still valid? */
-  checkResetToken(
-    token: string,
-    signal?: AbortSignal,
-  ): Promise<ResetTokenCheckResponse> {
-    return this.request<ResetTokenCheckResponse>("/plural/reset-password/check", {
-      envelope: "bare",
-      query: { token },
-      signal,
-    });
-  }
-
-  /** POST /plural/reset-password — set a new password (≥10 chars) with a token. */
-  resetPassword(input: {
-    token: string;
-    newPassword: string;
-    turnstileToken: string;
-    signal?: AbortSignal;
-  }): Promise<ResetPasswordResponse> {
-    return this.request<ResetPasswordResponse>("/plural/reset-password", {
-      method: "POST",
-      envelope: "bare",
-      body: {
-        token: input.token,
-        new_password: input.newPassword,
-        turnstile_token: input.turnstileToken,
-      },
-      signal: input.signal,
-    });
+  pocketIdLoginUrl(from?: string): string {
+    const url = new URL(`${this.baseUrl}/plural/auth/pocketid/login`);
+    if (from) url.searchParams.set("from", from);
+    return url.toString();
   }
 
   /** GET /plural/user_info — the logged-in user (requires bearer token). */

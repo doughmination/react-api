@@ -15,8 +15,6 @@ import { useDoughmination, useDoughminationClient } from "../provider/context";
 import { DoughminationError } from "../client/errors";
 import { queryKeys } from "./keys";
 import type {
-  LoginResponse,
-  SignupResponse,
   SwitchResponse,
   Relationship,
   AddRelationshipInput,
@@ -51,82 +49,6 @@ export function useTurnstileResolver(): (explicit?: string) => Promise<string> {
       { status: 400, code: "missing_turnstile_token", url: "" },
     );
   };
-}
-
-export interface LoginVariables {
-  username: string;
-  password: string;
-  /** Overrides the provider's `turnstile` callback for this call. */
-  turnstileToken?: string;
-}
-
-/**
- * Log in and receive a JWT.
- *
- * The package does not store the token for you — put it wherever your app
- * keeps auth state and feed it back through the provider's `token` prop.
- *
- * ```tsx
- * const login = useLogin();
- * await login.mutateAsync({ username, password, turnstileToken });
- * ```
- */
-export function useLogin(
-  options?: MutationOptionsFor<LoginResponse, LoginVariables>,
-): UseMutationResult<LoginResponse, DoughminationError, LoginVariables> {
-  const client = useDoughminationClient();
-  const queryClient = useQueryClient();
-  const resolveTurnstile = useTurnstileResolver();
-
-  return useMutation({
-    mutationFn: async (variables) =>
-      client.login({
-        username: variables.username,
-        password: variables.password,
-        turnstileToken: await resolveTurnstile(variables.turnstileToken),
-      }),
-    ...options,
-    onSuccess: (data, variables, onMutateResult, context) => {
-      void queryClient.invalidateQueries({ queryKey: queryKeys.plural.userInfo() });
-      options?.onSuccess?.(data, variables, onMutateResult, context);
-    },
-  });
-}
-
-export interface SignupVariables {
-  username: string;
-  /** At least 10 characters, enforced server-side. */
-  password: string;
-  /** Required — the account can't log in until this address is confirmed. */
-  email: string;
-  displayName?: string | null;
-  turnstileToken?: string;
-}
-
-/**
- * Create an account. Turnstile and an email are both required by the API.
- *
- * The account can't log in until the emailed link is confirmed. The response
- * carries a one-time `correction_token` — hold onto it if you want to let the
- * user fix a mistyped address (`useCorrectEmail`) without a password.
- */
-export function useSignup(
-  options?: MutationOptionsFor<SignupResponse, SignupVariables>,
-): UseMutationResult<SignupResponse, DoughminationError, SignupVariables> {
-  const client = useDoughminationClient();
-  const resolveTurnstile = useTurnstileResolver();
-
-  return useMutation({
-    mutationFn: async (variables) =>
-      client.signup({
-        username: variables.username,
-        password: variables.password,
-        email: variables.email,
-        displayName: variables.displayName ?? null,
-        turnstileToken: await resolveTurnstile(variables.turnstileToken),
-      }),
-    ...options,
-  });
 }
 
 /**

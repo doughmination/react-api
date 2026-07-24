@@ -87,8 +87,6 @@ export type { UsePresenceResult } from "./hooks/presence";
 
 // ---- Mutations -------------------------------------------------------------
 export {
-  useLogin,
-  useSignup,
   useGuestbookPost,
   useDeleteGuestbookEntry,
   useSetFronters,
@@ -100,32 +98,10 @@ export {
   useReportDevice,
 } from "./hooks/mutations";
 export type {
-  LoginVariables,
-  SignupVariables,
   SetMentalStateVariables,
   SetMemberPrideVariables,
   MutationOptionsFor,
 } from "./hooks/mutations";
-
-// ---- Account recovery ------------------------------------------------------
-export {
-  useVerifyEmail,
-  useResendVerification,
-  useCorrectEmail,
-  useForgotPassword,
-  useForgotUsername,
-  useResetPassword,
-  useResetTokenValid,
-  useUsernameAvailable,
-  useEmailAvailable,
-} from "./hooks/account";
-export type {
-  ResendVerificationVariables,
-  CorrectEmailVariables,
-  ForgotPasswordVariables,
-  ForgotUsernameVariables,
-  ResetPasswordVariables,
-} from "./hooks/account";
 
 // ---- Query keys ------------------------------------------------------------
 export { queryKeys } from "./hooks/keys";
