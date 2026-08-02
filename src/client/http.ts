@@ -23,6 +23,7 @@ import type {
   UnifiedMinecraftHypixel,
   VanillaCapeList,
 } from "../types/minecraft";
+import type { UnifiedGenshinRoster } from "../types/genshin";
 import type {
   FrontersResponse,
   PluralMember,
@@ -309,6 +310,24 @@ export class DoughminationClient {
       envelope: "worker",
       signal,
     });
+  }
+
+  // ---- Genshin --------------------------------------------------------------
+
+  /**
+   * GET /genshin/roster/:uid — every playable character, merged against a
+   * live Enka.Network lookup: owned/not-owned + level. Check `data.partial`
+   * before treating this as the account's full roster — see
+   * `UnifiedGenshinRoster` for why.
+   */
+  getGenshinRoster(
+    uid: string,
+    signal?: AbortSignal,
+  ): Promise<UnifiedGenshinRoster> {
+    return this.request<UnifiedGenshinRoster>(
+      `/genshin/roster/${encodeURIComponent(uid)}`,
+      { envelope: "worker", signal },
+    );
   }
 
   // ---- Plural: reads ------------------------------------------------------

@@ -1,0 +1,45 @@
+/**
+ * Genshin types — transcribed from the API's `src/types.ts` and
+ * `src/genshin.ts`.
+ *
+ *   GET /v2/genshin/roster/:uid  -> { success, data: UnifiedGenshinRoster }
+ *
+ * Data comes from Enka.Network's live UID lookup, merged against a cached
+ * character catalog (names/elements/icons). See `partial` below before
+ * treating `owned`/`level` as a complete picture of the account.
+ */
+
+/** One playable character, joined against the requested UID's owned roster. */
+export interface UnifiedGenshinCharacter {
+  /** Enka/game avatarId, as a string. */
+  id: string;
+  name: string;
+  /** Localized element name, e.g. "Pyro", "Cryo", "Dendro". */
+  element: string;
+  /** 4 or 5. */
+  rarity: number;
+  icon_url: string;
+  owned: boolean;
+  /** Character level, or null if not owned. */
+  level: number | null;
+}
+
+/** GET /v2/genshin/roster/:uid */
+export interface UnifiedGenshinRoster {
+  uid: string;
+  nickname: string | null;
+  player_level: number | null;
+  /**
+   * True when Enka only returned the player's pinned Character Showcase
+   * (at most 8 characters) rather than their full roster. This happens when
+   * the player hasn't enabled "Display all your characters" in-game — until
+   * they do, `owned`/`level` below are only accurate for the characters
+   * they've pinned, not their whole account. Surface this in the UI rather
+   * than silently rendering an incomplete "not owned" list.
+   */
+  partial: boolean;
+  owned_count: number;
+  total_count: number;
+  characters: UnifiedGenshinCharacter[];
+  updated_at: number;
+}

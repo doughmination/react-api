@@ -26,6 +26,12 @@ export const queryKeys = {
     capes: () => ["doughmination", "minecraft", "capes"] as const,
   },
 
+  genshin: {
+    all: ["doughmination", "genshin"] as const,
+    roster: (uid: string) =>
+      ["doughmination", "genshin", "roster", uid] as const,
+  },
+
   plural: {
     all: ["doughmination", "plural"] as const,
     fronters: () => ["doughmination", "plural", "fronters"] as const,

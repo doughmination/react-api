@@ -82,7 +82,7 @@ import {
 } from "@doughmination/react-api";
 
 useDiscordUser("209830981060788225");        // merged profile + badges + presence
-useDiscordUsers(["id1", "id2"]);             // batch, up to 100 ids
+useGenshinRoster("691386457");               // Genshin Impact roster
 useMinecraftProfile("79ef438d69ea473c99cd6a5ec34c6736"); // skin, capes, render URLs
 useHypixelStats(uuid);                        // Hypixel + SkyBlock (allowlisted UUIDs only)
 useFronters();                                // current front — live (see below)
