@@ -23,7 +23,12 @@ import type {
   UnifiedMinecraftHypixel,
   VanillaCapeList,
 } from "../types/minecraft";
-import type { UnifiedGenshinRoster } from "../types/genshin";
+import type {
+  UnifiedGenshinRoster,
+  UnifiedGenshinCharacterDetail,
+  UnifiedGenshinCharacterItems,
+  UnifiedGenshinCharacterConstellations,
+} from "../types/genshin";
 import type {
   FrontersResponse,
   PluralMember,
@@ -326,6 +331,46 @@ export class DoughminationClient {
   ): Promise<UnifiedGenshinRoster> {
     return this.request<UnifiedGenshinRoster>(
       `/genshin/roster/${encodeURIComponent(uid)}`,
+      { envelope: "worker", signal },
+    );
+  }
+
+  /**
+   * GET /genshin/roster/:uid/:heroId — full detail for one character: level,
+   * constellation, friendship, weapon, artifacts. `heroId` is the numeric
+   * avatarId from a roster entry's `id` field.
+   */
+  getGenshinCharacter(
+    uid: string,
+    heroId: string,
+    signal?: AbortSignal,
+  ): Promise<UnifiedGenshinCharacterDetail> {
+    return this.request<UnifiedGenshinCharacterDetail>(
+      `/genshin/roster/${encodeURIComponent(uid)}/${encodeURIComponent(heroId)}`,
+      { envelope: "worker", signal },
+    );
+  }
+
+  /** GET /genshin/roster/:uid/:heroId/items — just weapon + artifacts. */
+  getGenshinCharacterItems(
+    uid: string,
+    heroId: string,
+    signal?: AbortSignal,
+  ): Promise<UnifiedGenshinCharacterItems> {
+    return this.request<UnifiedGenshinCharacterItems>(
+      `/genshin/roster/${encodeURIComponent(uid)}/${encodeURIComponent(heroId)}/items`,
+      { envelope: "worker", signal },
+    );
+  }
+
+  /** GET /genshin/roster/:uid/:heroId/constellations — just constellation + friendship. */
+  getGenshinCharacterConstellations(
+    uid: string,
+    heroId: string,
+    signal?: AbortSignal,
+  ): Promise<UnifiedGenshinCharacterConstellations> {
+    return this.request<UnifiedGenshinCharacterConstellations>(
+      `/genshin/roster/${encodeURIComponent(uid)}/${encodeURIComponent(heroId)}/constellations`,
       { envelope: "worker", signal },
     );
   }

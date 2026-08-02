@@ -59,7 +59,12 @@ export {
   useMinecraftCapes,
 } from "./hooks/minecraft";
 
-export { useGenshinRoster } from "./hooks/genshin";
+export {
+  useGenshinRoster,
+  useGenshinCharacter,
+  useGenshinCharacterItems,
+  useGenshinCharacterConstellations,
+} from "./hooks/genshin";
 
 export {
   useFronters,

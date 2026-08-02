@@ -30,6 +30,12 @@ export const queryKeys = {
     all: ["doughmination", "genshin"] as const,
     roster: (uid: string) =>
       ["doughmination", "genshin", "roster", uid] as const,
+    character: (uid: string, heroId: string) =>
+      ["doughmination", "genshin", "character", uid, heroId] as const,
+    characterItems: (uid: string, heroId: string) =>
+      ["doughmination", "genshin", "character-items", uid, heroId] as const,
+    characterConstellations: (uid: string, heroId: string) =>
+      ["doughmination", "genshin", "character-constellations", uid, heroId] as const,
   },
 
   plural: {
