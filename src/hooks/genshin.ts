@@ -23,10 +23,13 @@ import type {
  * Every playable character for a Genshin UID, merged against a live
  * Enka.Network lookup: owned/not-owned + level.
  *
- * Check `data.partial` before trusting `owned`/`level` as the whole account —
- * it's `true` when the player hasn't enabled "Display all your characters"
- * on their in-game Character Showcase, in which case Enka (and this hook)
- * only sees their pinned showcase, not their full roster.
+ * Owned characters are never lost: the API unions live Enka data with a
+ * persistent ownership ledger. Per character, `owned` means "ever owned" and
+ * `tracked` means "in the live Enka response right now" — an owned character
+ * with `tracked: false` (e.g. unpinned from the showcase) still shows its
+ * last-known `level`. `data.partial` flags a showcase-only live response;
+ * `data.stale` flags a response served entirely from the ledger because Enka
+ * was unavailable.
  *
  * ```tsx
  * const { data } = useGenshinRoster("691386457");
@@ -34,6 +37,8 @@ import type {
  *   // prompt: enable "Display all your characters" in-game for full tracking
  * }
  * const owned = data?.characters.filter((c) => c.owned) ?? [];
+ * const liveTracked = owned.filter((c) => c.tracked); // fresh levels
+ * const untracked = owned.filter((c) => !c.tracked);  // owned, last-known level
  * ```
  */
 export function useGenshinRoster(

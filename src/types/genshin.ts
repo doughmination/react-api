@@ -5,8 +5,12 @@
  *   GET /v2/genshin/roster/:uid  -> { success, data: UnifiedGenshinRoster }
  *
  * Data comes from Enka.Network's live UID lookup, merged against a cached
- * character catalog (names/elements/icons). See `partial` below before
- * treating `owned`/`level` as a complete picture of the account.
+ * character catalog (names/elements/icons), then unioned with the API's
+ * persistent ownership ledger so nothing seen owned is ever lost. Each
+ * character carries `tracked` (present in the live Enka data) alongside
+ * `owned`; the roster carries `stale` (served entirely from the ledger
+ * because Enka was unavailable). See those fields before treating
+ * `owned`/`level` as a complete, live picture of the account.
  */
 
 /** One playable character, joined against the requested UID's owned roster. */
@@ -22,6 +26,22 @@ export interface UnifiedGenshinCharacter {
   owned: boolean;
   /** Character level, or null if not owned. */
   level: number | null;
+  /**
+   * True when this character is in the CURRENT live Enka response (pinned
+   * showcase, or full roster with "Display all" on). False when it's known
+   * only from the API's persistent ownership ledger — i.e. it was seen owned
+   * before but has since dropped out of Enka (unpinned from the showcase,
+   * "Display all" turned off, or the profile went private). Such a character
+   * is still `owned: true`; it just isn't tracked live anymore, so `level` is
+   * the last value ever seen. Always false when `owned` is false.
+   *
+   * Use this to tell "owned, live level" from "owned, last-known level" in the
+   * UI — e.g. a subtler badge for untracked characters.
+   */
+  tracked: boolean;
+  /** Epoch ms of the last time this character was seen in a live Enka
+   *  response, or null if never seen live (i.e. not owned). */
+  last_seen: number | null;
 }
 
 /** GET /v2/genshin/roster/:uid */
@@ -38,7 +58,19 @@ export interface UnifiedGenshinRoster {
    * than silently rendering an incomplete "not owned" list.
    */
   partial: boolean;
+  /**
+   * True when this WHOLE response was served from the persistent ownership
+   * ledger because the live Enka fetch failed (profile private, UID
+   * unindexed, or Enka upstream down). Every character is then `tracked:
+   * false` with last-known levels. When false, the ledger was merged with
+   * fresh live data as normal. Show a "live data temporarily unavailable"
+   * hint when true.
+   */
+  stale: boolean;
   owned_count: number;
+  /** Of the owned characters, how many are currently tracked live (present in
+   *  the Enka response). `owned_count - tracked_count` = owned-but-untracked. */
+  tracked_count: number;
   total_count: number;
   characters: UnifiedGenshinCharacter[];
   updated_at: number;
