@@ -1,6 +1,6 @@
 {
   "name": "@doughmination/react-api",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "React hooks and typed client for the Doughmination API — Discord presence, Minecraft/Hypixel stats, plural system fronters, devices and guestbook, with a single live WebSocket.",
   "license": "SEE LICENSE IN licence.md",
   "author": "Clove Twilight",
@@ -14,6 +14,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
     },
     "./package.json": "./package.json"
   },
