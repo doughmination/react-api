@@ -1,9 +1,9 @@
-# @doughmination/react-api
+# doughmination-api
 
-[![Socket Badge](https://badge.socket.dev/npm/package/@doughmination/react-api)](https://badge.socket.dev/npm/package/@doughmination/react-api)
-[![npm version](https://img.shields.io/npm/v/@doughmination/react-api.svg)](https://www.npmjs.com/package/@doughmination/react-api)
+[![Socket Badge](https://badge.socket.dev/npm/package/doughmination-api)](https://badge.socket.dev/npm/package/doughmination-api)
+[![npm version](https://img.shields.io/npm/v/doughmination-api)](https://www.npmjs.com/package/doughmination-api)
 [![Publish](https://github.com/doughmination/react-api/actions/workflows/publish.yml/badge.svg)](https://github.com/doughmination/react-api/actions/workflows/publish.yml)
-[![types included](https://img.shields.io/npm/types/@doughmination/react-api.svg)](https://www.npmjs.com/package/@doughmination/react-api)
+[![types included](https://img.shields.io/npm/types/doughmination-api.svg)](https://www.npmjs.com/package/doughmination-api)
 [![React 18 | 19](https://img.shields.io/badge/React-18%20%7C%2019-61dafb.svg?logo=react)](https://react.dev)
 [![TanStack Query v5](https://img.shields.io/badge/TanStack%20Query-v5-ef4444.svg)](https://tanstack.com/query)
 [![license](https://img.shields.io/badge/license-custom-blue.svg)](./licence.md)
@@ -18,8 +18,8 @@ Typed client and React hooks for the [Doughmination API](https://doughmination.u
 ## Install
 
 ```bash
-npm i @doughmination/react-api @tanstack/react-query react
-# or: bun add @doughmination/react-api @tanstack/react-query react
+npm i doughmination-api @tanstack/react-query react
+# or: bun add doughmination-api @tanstack/react-query react
 ```
 
 `react` and `@tanstack/react-query` are peer dependencies — the package uses your app's copies.
@@ -30,7 +30,7 @@ Wrap your app in a TanStack `QueryClientProvider`, then `DoughminationProvider`:
 
 ```tsx
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { DoughminationProvider } from "@doughmination/react-api";
+import { DoughminationProvider } from "doughmination-api";
 
 const queryClient = new QueryClient();
 
@@ -79,7 +79,7 @@ import {
   useMentalState,
   useDevices,
   useGuestbook,
-} from "@doughmination/react-api";
+} from "doughmination-api";
 
 useDiscordUser("209830981060788225");        // merged profile + badges + presence
 useGenshinRoster("691386457");               // Genshin Impact roster
@@ -108,23 +108,6 @@ function ProfileCard({ id }: { id: string }) {
   );
 }
 ```
-
-### Hypixel helpers
-
-`player` and `skyblock` come back as raw upstream blobs (the API defines no schema for them). Typed accessors read the common fields defensively:
-
-```tsx
-import { useHypixelStats, getPlayerSummary, getSkyblockProfiles } from "@doughmination/react-api";
-
-function Stats({ uuid }: { uuid: string }) {
-  const { data } = useHypixelStats(uuid);
-  const player = getPlayerSummary(data);   // { rank, networkLevel, karma, firstLogin, ... }
-  const profiles = getSkyblockProfiles(data);
-  return <p>{player.rank ?? "Unranked"} · level {Math.floor(player.networkLevel ?? 0)}</p>;
-}
-```
-
-`useHypixelStats` returns `403` for any UUID that isn't one of the operator's own accounts — that's by design (Hypixel's API policy forbids proxying arbitrary players). An allowlisted player who's never joined Hypixel still resolves `200`; check `data.source.player` to tell the cases apart.
 
 ## Realtime
 
@@ -162,7 +145,7 @@ function FrontList() {
 Presence is the one **opt-in** feed. `usePresence` sends the subscribe frame, receives the `init_state` snapshot, then live `presence_update` events — for the users you asked for only. Subscriptions are ref-counted, so several components can watch overlapping ids safely.
 
 ```tsx
-import { usePresence } from "@doughmination/react-api";
+import { usePresence } from "doughmination-api";
 
 function LivePresence({ ids }: { ids: string[] }) {
   const { presences, isLive, isReady } = usePresence(ids);
@@ -191,7 +174,7 @@ Pass `"all"` to follow every tracked user: `usePresence("all")`. For a single us
 ### Live device state
 
 ```tsx
-import { useDeviceState } from "@doughmination/react-api";
+import { useDeviceState } from "doughmination-api";
 
 function Battery() {
   const { device, isLive } = useDeviceState("iphone");
@@ -209,7 +192,7 @@ function Battery() {
 ### Any raw event
 
 ```tsx
-import { useDoughminationEvent } from "@doughmination/react-api";
+import { useDoughminationEvent } from "doughmination-api";
 
 useDoughminationEvent("force_refresh", () => toast("Data refreshed"));
 ```
@@ -221,7 +204,7 @@ By default the provider also invalidates all package queries when it receives `f
 Reads need nothing. Writes (switching fronters, setting mental state, device reports, guestbook moderation) need a credential on the provider.
 
 ```tsx
-import { useLogin, useSetFronters } from "@doughmination/react-api";
+import { useLogin, useSetFronters } from "doughmination-api";
 
 function LoginForm() {
   const login = useLogin();
@@ -252,7 +235,7 @@ import {
   useSignup, useVerifyEmail, useResendVerification, useCorrectEmail,
   useForgotPassword, useForgotUsername, useResetPassword, useResetTokenValid,
   useUsernameAvailable, useEmailAvailable,
-} from "@doughmination/react-api";
+} from "doughmination-api";
 
 const signup = useSignup();
 const { correction_token } = await signup.mutateAsync({ username, password, email });
@@ -286,7 +269,7 @@ const tokenRef = useRef<string>("");
 ### Guestbook post
 
 ```tsx
-import { useGuestbook, useGuestbookPost } from "@doughmination/react-api";
+import { useGuestbook, useGuestbookPost } from "doughmination-api";
 
 function Guestbook() {
   const { data } = useGuestbook({ limit: 20 });
@@ -308,7 +291,7 @@ Guestbook posts are rate limited to one per 60s per IP — that surfaces as a `D
 Both of the API's error conventions (`{success:false, error:{code,message}}` from the Worker routes and `{detail}` from the system routes) are normalised into one `DoughminationError`:
 
 ```tsx
-import { isDoughminationError } from "@doughmination/react-api";
+import { isDoughminationError } from "doughmination-api";
 
 try {
   await post.mutateAsync({ name, message });
@@ -326,7 +309,7 @@ try {
 The typed client is exported on its own — handy for scripts, SSR loaders, or route handlers:
 
 ```ts
-import { DoughminationClient } from "@doughmination/react-api";
+import { DoughminationClient } from "doughmination-api";
 
 const client = new DoughminationClient();               // reads need no config
 const fronters = await client.getFronters();
