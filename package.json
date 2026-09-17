@@ -1,5 +1,5 @@
 {
-  "name": "@doughmination/react-api",
+  "name": "doughmination-api",
   "version": "1.6.0",
   "description": "React hooks and typed client for the Doughmination API — Discord presence, Minecraft/Hypixel stats, plural system fronters, devices and guestbook, with a single live WebSocket.",
   "license": "SEE LICENSE IN licence.md",
